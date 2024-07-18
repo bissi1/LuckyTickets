@@ -1,0 +1,98 @@
+% MATLAB Code accompanying the article preprint "Revisiting Combinatorics of Lucky
+% Tickets: Unique Numbers and Prime Numbers"
+% July 2024
+% Bismark Singh
+% b.singh@southampton.ac.uk
+
+clc
+
+% Define all empty counters
+lucky_counter =0; lucky_value= zeros(27,1); lucky=zeros(999999,1);
+luckyticket=[]; 
+superlucky_counter =0; superlucky_value= zeros(27,1); superlucky=zeros(999999,1);
+superluckyticket=[];
+luckyprime_counter =0; luckyprime_value= zeros(27,1); luckyprime=zeros(999999,1);
+luckyprimeticket=[];
+
+
+%% Count all lucky numbers
+
+for i=1:999999
+    number = i; 
+    i = sprintf('%06d', i) ;
+    number_string =num2str(i) ; left_string=number_string(1:3); right_string=number_string(4:6);
+    left_sum = sum(left_string-'0');
+    right_sum = sum(right_string-'0');
+    
+    if left_sum == right_sum
+        luckyticket= [luckyticket,number] ;
+        lucky_counter = lucky_counter+1;
+        lucky(lucky_counter) = number ;     
+        % check how many values for each left_sum right_sum 
+        lucky_value(left_sum) = lucky_value(left_sum) + 1;
+    end
+end
+
+%% Count all superlucky numbers
+
+for i=1:999999
+    number = i; 
+    i = sprintf( '%06d', i ) ;
+    number_string =num2str(i) ; left_string=number_string(1:3); right_string=number_string(4:6);
+    left_sum = sum(left_string-'0');
+    right_sum = sum(right_string-'0');
+    
+    [~,num_unique,~] = unique(i) ;
+
+    if left_sum == right_sum && numel(num_unique) ==6
+        superluckyticket= [superluckyticket,number] ;
+        superlucky_counter = superlucky_counter+1;
+        superlucky(superlucky_counter) = number ;  
+        % check how many values for each left_sum right_sum 
+        superlucky_value(left_sum) = superlucky_value(left_sum) + 1;
+    end
+end
+    
+%% Count all lucky prime numbers
+
+for i=1:999999
+    number = i; 
+    i = sprintf( '%06d', i ) ;
+    number_string =num2str(i) ; left_string=number_string(1:3); right_string=number_string(4:6);
+    left_sum = sum(left_string-'0');
+    right_sum = sum(right_string-'0');
+    
+    dummy       = char(num2cell(i));
+    num_prime   =isprime(reshape(str2num(dummy),1,[])) ;
+
+    if left_sum == right_sum && sum(num_prime) ==6
+        luckyprimeticket=[luckyprimeticket,number];
+        luckyprime_counter = luckyprime_counter+1;
+        luckyprime(luckyprime_counter) = number ;     
+        % check how many values for each left_sum right_sum 
+        luckyprime_value(left_sum) = luckyprime_value(left_sum) + 1;
+    end
+end
+%% End of script. Count miscellaneous results.
+
+% how many tickets to buy to ensure luckiness?
+dum=zeros(numel(luckyticket),1);
+for i=2:numel(luckyticket)
+    dum(i) = luckyticket(i) - luckyticket(i-1);
+end
+dummy=max(dum);
+fprintf('Minimum of %d tickets are needed to ensure a Lucky Ticket\n',dummy)
+clear dum ;
+% how many tickets to buy to ensure superluckiness?
+for i=2:numel(superluckyticket)
+    dum(i) = superluckyticket(i) - superluckyticket(i-1);
+end
+dummy=max(dum);
+fprintf('Minimum of %d tickets are needed to ensure a Superlucky Ticket\n',dummy)
+clear dum;
+% how many tickets to buy to ensure primeluckiness?
+for i=2:numel(luckyprimeticket)
+    dum(i) = luckyprimeticket(i) - luckyprimeticket(i-1);
+end
+dummy=max(dum);
+fprintf('Minimum of %d tickets are needed to ensure a LuckyPrime Ticket\n',dummy)
